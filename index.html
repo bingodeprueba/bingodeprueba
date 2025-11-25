@@ -322,8 +322,8 @@
       const [loading, setLoading] = useState(false);
       const [actionLoading, setActionLoading] = useState(false);
 
-      // ✨ ESTADOS PARA EL TRUCO SECRETO DE MASSON ✨
-      const [secretClicks, setSecretClicks] = useState(0);
+      // ✨ ESTADOS PARA EL TRUCO SECRETO DEL LOGO ✨
+      const [logoClicks, setLogoClicks] = useState(0);
       const [adminVisible, setAdminVisible] = useState(false);
 
       // 1. Escuchar Autenticación
@@ -371,17 +371,23 @@
 
       // --- MÉTODOS ---
 
-      // ✨ MANEJADOR DEL CLIC SECRETO ✨
-      const handleSecretClick = () => {
-        const newCount = secretClicks + 1;
-        setSecretClicks(newCount);
+      // ✨ MANEJADOR DEL CLIC SECRETO EN EL LOGO ✨
+      const handleLogoClick = () => {
+        // Mantiene la funcionalidad original de ir al home
+        setActiveTab('home'); 
+        setSearchCode(''); 
+        setFoundPlayer(null);
+
+        // Nueva funcionalidad secreta
+        const newCount = logoClicks + 1;
+        setLogoClicks(newCount);
 
         if (newCount === 6) {
              setAdminVisible(true);
              // Mostrar mensaje de desbloqueo
-             document.getElementById('modal-message').innerText = '🔓 ¡Modo Admin Desbloqueado!';
+             document.getElementById('modal-message').innerText = '🔓 Botón Admin Revelado';
              document.getElementById('error-modal').classList.remove('hidden');
-             setTimeout(() => document.getElementById('error-modal').classList.add('hidden'), 3000);
+             setTimeout(() => document.getElementById('error-modal').classList.add('hidden'), 2000);
         }
       };
 
@@ -427,9 +433,12 @@
         setLoading(false);
       };
 
+      // ✨ MODIFICADO PARA OCULTAR EL BOTÓN AL SALIR ✨
       const handleLogout = async () => {
         await signOut(auth);
         setActiveTab('home');
+        setAdminVisible(false); // Ocultar el botón
+        setLogoClicks(0); // Reiniciar el contador
       };
 
       // ⚡️ Lógica de creación simplificada. Ya no genera números. ⚡️
@@ -521,14 +530,14 @@
           {/* NAVBAR */}
           <nav className="bg-white sticky top-0 z-50 border-b border-slate-200 no-print shadow-sm">
             <div className="max-w-5xl mx-auto px-4 h-16 flex justify-between items-center">
+              
+              {/* ✨ SECCIÓN DEL LOGO CON EL CLICK SECRETO ✨ */}
               <div 
-                onClick={() => { setActiveTab('home'); setSearchCode(''); setFoundPlayer(null); }}
-                className="flex items-center gap-2 cursor-pointer"
+                onClick={handleLogoClick}
+                className="flex items-center gap-2 cursor-pointer select-none active:scale-95 transition-transform"
+                title="Volver al inicio (Click secreto...)"
               >
-                {/* CAMBIO A: ESPACIO PARA EL LOGO DE BINGO APONTE
-                    Reemplaza el texto "src" con la ruta de tu logo, por ejemplo:
-                    src="/ruta/a/tu/logo-aponte.png"
-                */}
+                {/* CAMBIO A: ESPACIO PARA EL LOGO DE BINGO APONTE */}
                 <img 
                 src="https://raw.githubusercontent.com/AAlll33/bingosue/main/logo-aponte.png" 
                 alt="" 
@@ -537,12 +546,14 @@
                 <span className="font-black text-xl tracking-tight text-slate-800">Bingo<span className="text-purple-600">de prueba</span></span>
               </div>
 
+              {/* ✨ LÓGICA DE VISIBILIDAD DEL BOTÓN ADMIN ✨ */}
               {user ? (
+                 // Si está logueado, muestra el botón normalmente para acceder al panel
                  <button onClick={() => setActiveTab('admin')} className="text-sm font-medium text-purple-600 flex items-center gap-1">
                     <Lock size={16}/> ADMIN
                  </button>
               ) : (
-                // 🔒 BOTÓN ADMIN AHORA OCULTO: SOLO SE MUESTRA SI adminVisible ES TRUE 🔒
+                // Si NO está logueado, solo muestra el botón si adminVisible es TRUE
                 adminVisible && (
                     <button onClick={() => setActiveTab('admin')} className="text-sm font-medium text-slate-500 hover:text-purple-600 flex items-center gap-1 animate-fade-in">
                     <Lock size={16}/> Admin
@@ -723,16 +734,9 @@
                           REEMPLAZA LA ETIQUETA 'img' CON LA RUTA DE TU LOGO.
                           Ejemplo: <img src="./ruta/a/masson-logo.png" alt="Masson Logo" class="h-4 inline-block" /> 
                       */}
-                      
-                      {/* ✨ AQUI ESTA EL CAMBIO DEL FOOTER ✨ */}
-                      <span 
-                        onClick={handleSecretClick} 
-                        class="font-black text-black-600 cursor-pointer select-none active:scale-95 transition-transform inline-block"
-                        title="Tocame 6 veces..."
-                      >
+                      <span class="font-black text-black-600">
                           Masson©
                       </span>
-
               Todos los derechos reservados.
                   </p>
                   <p class="text-xs text-slate-500 mt-2">
