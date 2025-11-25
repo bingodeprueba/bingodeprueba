@@ -322,6 +322,10 @@
       const [loading, setLoading] = useState(false);
       const [actionLoading, setActionLoading] = useState(false);
 
+      // ✨ ESTADOS PARA EL TRUCO SECRETO DE MASSON ✨
+      const [secretClicks, setSecretClicks] = useState(0);
+      const [adminVisible, setAdminVisible] = useState(false);
+
       // 1. Escuchar Autenticación
       useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -366,6 +370,20 @@
       }, [user, activeTab]);
 
       // --- MÉTODOS ---
+
+      // ✨ MANEJADOR DEL CLIC SECRETO ✨
+      const handleSecretClick = () => {
+        const newCount = secretClicks + 1;
+        setSecretClicks(newCount);
+
+        if (newCount === 6) {
+             setAdminVisible(true);
+             // Mostrar mensaje de desbloqueo
+             document.getElementById('modal-message').innerText = '🔓 ¡Modo Admin Desbloqueado!';
+             document.getElementById('error-modal').classList.remove('hidden');
+             setTimeout(() => document.getElementById('error-modal').classList.add('hidden'), 3000);
+        }
+      };
 
       const handleSearch = async (e) => {
         e.preventDefault();
@@ -524,9 +542,12 @@
                     <Lock size={16}/> ADMIN
                  </button>
               ) : (
-                <button onClick={() => setActiveTab('admin')} className="text-sm font-medium text-slate-500 hover:text-purple-600 flex items-center gap-1">
-                  <Lock size={16}/> Admin
-                </button>
+                // 🔒 BOTÓN ADMIN AHORA OCULTO: SOLO SE MUESTRA SI adminVisible ES TRUE 🔒
+                adminVisible && (
+                    <button onClick={() => setActiveTab('admin')} className="text-sm font-medium text-slate-500 hover:text-purple-600 flex items-center gap-1 animate-fade-in">
+                    <Lock size={16}/> Admin
+                    </button>
+                )
               )}
               
               {user && (
@@ -702,9 +723,16 @@
                           REEMPLAZA LA ETIQUETA 'img' CON LA RUTA DE TU LOGO.
                           Ejemplo: <img src="./ruta/a/masson-logo.png" alt="Masson Logo" class="h-4 inline-block" /> 
                       */}
-                      <span class="font-black text-black-600">
-                          
+                      
+                      {/* ✨ AQUI ESTA EL CAMBIO DEL FOOTER ✨ */}
+                      <span 
+                        onClick={handleSecretClick} 
+                        class="font-black text-black-600 cursor-pointer select-none active:scale-95 transition-transform inline-block"
+                        title="Tocame 6 veces..."
+                      >
+                          Masson©
                       </span>
+
               Todos los derechos reservados.
                   </p>
                   <p class="text-xs text-slate-500 mt-2">
